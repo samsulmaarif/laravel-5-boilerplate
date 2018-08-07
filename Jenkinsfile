@@ -1,11 +1,12 @@
 pipeline {
-  agent {
-    docker { 
-      image 'samsulmaarif/php-laravel:7.1' 
+  agent any //{
+    //docker { 
+    //  image 'samsulmaarif/php-laravel:7.1'
+    //  label 'dotdocker'
       //args '-v /tmp/composer-XXX:/root/.composer'
-      reuseNode true
-    } 
-  }
+    //  reuseNode true
+    //} 
+  //}
   options {
     // Stop the build early in case of compile or test failures
     skipStagesAfterUnstable()
@@ -21,9 +22,9 @@ pipeline {
     stage('Composer') {
       steps {
         //sh 'whoami && pwd && cat /etc/*release'
-        //sh 'curl -sS https://getcomposer.org/installer | php'
-        sh 'composer install'
-        sh 'cp .env.example .env'
+        sh 'curl -sS https://getcomposer.org/installer | php'
+        sh 'php composer.phar install'
+        sh 'cp .env.testing .env'
         sh 'touch database/testing.sqlite'
         sh 'php artisan key:generate'
         sh 'php artisan migrate'
