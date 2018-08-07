@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker { 
       image 'samsulmaarif/php-laravel:7.1' 
-      //args '-v ${PWD}:/sdk/platforms'
+      //args '-v /tmp/composer-XXX:/root/.composer'
       reuseNode true
     } 
   }
@@ -11,12 +11,20 @@ pipeline {
     skipStagesAfterUnstable()
   }
   stages {
+    stage('repository_pull') {
+      steps {
+      // Checkout the master branch of the Laravel framework repository
+      sh 'env | sort'
+      git branch: 'master', url: 'https://github.com/linuxsidareja/laravel-5-boilerplate.git'
+      }
+    }
     stage('Composer') {
       steps {
-        sh 'curl -sS https://getcomposer.org/installer | php'
-        sh 'php composer.phar install'
+        //sh 'whoami && pwd && cat /etc/*release'
+        //sh 'curl -sS https://getcomposer.org/installer | php'
+        sh 'composer install'
         sh 'cp .env.example .env'
-        sh 'touch database/database.sqlite'
+        sh 'touch database/testing.sqlite'
         sh 'php artisan key:generate'
         sh 'php artisan migrate'
         sh 'php artisan db:seed'
