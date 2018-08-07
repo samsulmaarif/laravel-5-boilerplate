@@ -25,7 +25,7 @@ pipeline {
         sh 'curl -sS https://getcomposer.org/installer | php'
         sh 'php composer.phar install'
         sh 'cp .env.testing .env'
-        sh 'touch database/testing.sqlite'
+        sh 'touch database/database.sqlite'
         sh 'php artisan key:generate'
         sh 'php artisan migrate'
         sh 'php artisan db:seed'
