@@ -33,8 +33,8 @@ pipeline {
             sh 'php artisan key:generate'
             sh 'php artisan migrate --env=testing --database=sqlite_testing --force'
             //sh 'php artisan db:seed'
-            sh 'vendor/bin/codecept build'
-            sh 'vendor/bin/codecept run'
+            //sh 'vendor/bin/codecept build'
+            //sh 'vendor/bin/codecept run'
           }
         }
         stage('php 5.6') {
@@ -54,8 +54,8 @@ pipeline {
             sh 'php artisan key:generate'
             sh 'php artisan migrate --env=testing --database=sqlite_testing --force'
             //sh 'php artisan db:seed'
-            sh 'vendor/bin/codecept build'
-            sh 'vendor/bin/codecept run'
+            //sh 'vendor/bin/codecept build'
+            //sh 'vendor/bin/codecept run'
           }
         }
       }
