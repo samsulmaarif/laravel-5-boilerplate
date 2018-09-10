@@ -37,27 +37,27 @@ pipeline {
             //sh 'vendor/bin/codecept run'
           }
         }
-        stage('php 5.6') {
-          agent {
-            docker { 
-              image 'samsulmaarif/php-laravel:5.6'
-              //reuseNode true
-            } 
-          }
-          steps {
-            sh 'composer -v'
-            sh 'composer install -n --prefer-dist'
-            sh 'cp .env.testing .env'
-            sh 'touch database/database.sqlite'
-            sh 'touch storage/testing.sqlite'
-            sh 'php -v'
-            sh 'php artisan key:generate'
-            sh 'php artisan migrate --env=testing --database=sqlite_testing --force'
-            //sh 'php artisan db:seed'
-            //sh 'vendor/bin/codecept build'
-            //sh 'vendor/bin/codecept run'
-          }
-        }
+        // stage('php 5.6') {
+        //   agent {
+        //     docker { 
+        //       image 'samsulmaarif/php-laravel:5.6'
+        //       //reuseNode true
+        //     } 
+        //   }
+        //   steps {
+        //     sh 'composer -v'
+        //     sh 'composer install -n --prefer-dist'
+        //     sh 'cp .env.testing .env'
+        //     sh 'touch database/database.sqlite'
+        //     sh 'touch storage/testing.sqlite'
+        //     sh 'php -v'
+        //     sh 'php artisan key:generate'
+        //     sh 'php artisan migrate --env=testing --database=sqlite_testing --force'
+        //     //sh 'php artisan db:seed'
+        //     //sh 'vendor/bin/codecept build'
+        //     //sh 'vendor/bin/codecept run'
+        //   }
+        // }
       }
     }
     stage('We are deploying') {
