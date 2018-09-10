@@ -1,0 +1,86 @@
+---
+- name: Deploy to development server
+  hosts: develop
+  remote_user: deployer
+  gather_facts: no
+  vars:
+    deploy_to: /home/deployer/{{ project_name }}/releases/{{ release }}
+    current_release: /home/deployer/{{ project_name }}/current
+    artifact_dir: /home/deployer/{{ project_name }}/artifacts
+    git_identity_key: /home/deployer/.ssh/id_rsa
+    php_path: /usr/bin/php
+    composer_path: /usr/bin/composer
+    deploy_user: deployer
+  
+  tasks:
+  - name: Create version directory
+    file: path={{ deploy_to }}
+          state=directory
+
+  - name: Copy files to server
+    synchronize: src={{ app }}
+                 dest={{ deploy_to }}
+                 perms=yes
+                 recursive=yes
+                 delete=yes
+                 #owner={{ deploy_user }}
+                 #group={{ deploy_user }}
+
+  - name: Create version directory
+    file: path={{ deploy_to }}/{{ item }}
+          state=absent
+    with_items:
+    - storage
+    - public/uploads
+
+  - name: Update storage symlink
+    file: path={{ deploy_to }}/storage
+          src={{ artifact_dir }}/storage
+          state=link
+
+  - name: Update public/uploads symlink
+    file: path={{ deploy_to }}/public/uploads
+          src={{ artifact_dir }}/uploads
+          state=link
+
+  - name: Update public/uploads symlink
+    file: path={{ deploy_to }}/.env
+          src={{ artifact_dir }}/.environment
+          state=link
+
+  - name: Running composer install
+    shell: chdir={{ deploy_to }} 
+      {{ composer_path }} install --no-plugins --no-scripts --prefer-dist
+
+  - name: List artisan commands
+    shell: chdir={{ deploy_to }}
+      {{ php_path }} artisan
+    register: artisan_commands
+
+  - name: Optimize code
+    shell: chdir={{ deploy_to }}
+      {{ php_path }} artisan clear-compiled && {{ php_path }} artisan optimize
+    when: artisan_commands.stdout.find('optimize') != -1
+
+  - name: Run multiple artisan command
+    shell: chdir={{ deploy_to }}
+      {{ php_path }} artisan {{ item }}
+    with_items: 
+      - config:clear
+      - route:clear
+      - cache:clear
+      #- key:generate
+      - migrate
+      - db:seed
+      # - tambahkan yang diperlukan
+
+  - name: Delete current old release
+    file: path={{ current_release }}
+          state=absent
+    ignore_errors: no
+
+  - name: Create symlink
+    file: src={{ deploy_to }}
+          path={{ current_release }}
+          state=link
+    ignore_errors: no

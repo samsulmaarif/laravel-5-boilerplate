@@ -1,51 +1,79 @@
 pipeline {
-  agent any //{
-    //docker { 
-    //  image 'samsulmaarif/php-laravel:7.1'
-    //  label 'dotdocker'
-      //args '-v /tmp/composer-XXX:/root/.composer'
-    //  reuseNode true
-    //} 
-  //}
-  options {
-    // Stop the build early in case of compile or test failures
-    skipStagesAfterUnstable()
-  }
+  agent none
   stages {
     stage('repository_pull') {
+      agent {
+        docker { 
+          image 'samsulmaarif/php-laravel:7.1'
+          reuseNode true
+        } 
+      }
       steps {
-      // Checkout the master branch of the Laravel framework repository
-      sh 'env | sort'
-      git branch: 'master', url: 'https://github.com/linuxsidareja/laravel-5-boilerplate.git'
+        // Checkout the master branch of the Laravel framework repository
+        sh 'env | sort'
+        git branch: 'master', url: 'https://github.com/samsulmaarif/laravel-5-boilerplate.git'
       }
     }
-    stage('Composer') {
-      steps {
-        //sh 'whoami && pwd && cat /etc/*release'
-        sh 'curl -sS https://getcomposer.org/installer | php'
-        sh 'php composer.phar install'
-        sh 'cp .env.testing .env'
-        sh 'touch database/database.sqlite'
-        sh 'php artisan key:generate'
-        sh 'php artisan migrate'
-        sh 'php artisan db:seed'
+    stage('Unit Testing') {
+      parallel {
+        stage('php 7.1') {
+          agent {
+            docker { 
+              image 'samsulmaarif/php-laravel:7.1'
+              //reuseNode true
+            } 
+          }
+          steps {
+            sh 'composer -v'
+            sh 'composer install -n --prefer-dist'
+            sh 'cp .env.testing .env'
+            sh 'touch database/database.sqlite'
+            sh 'touch storage/testing.sqlite'
+            sh 'php -v'
+            sh 'php artisan key:generate'
+            sh 'php artisan migrate --env=testing --database=sqlite_testing --force'
+            //sh 'php artisan db:seed'
+            sh 'vendor/bin/codecept build'
+            sh 'vendor/bin/codecept run'
+          }
+        }
+        stage('php 5.6') {
+          agent {
+            docker { 
+              image 'samsulmaarif/php-laravel:5.6'
+              //reuseNode true
+            } 
+          }
+          steps {
+            sh 'composer -v'
+            sh 'composer install -n --prefer-dist'
+            sh 'cp .env.testing .env'
+            sh 'touch database/database.sqlite'
+            sh 'touch storage/testing.sqlite'
+            sh 'php -v'
+            sh 'php artisan key:generate'
+            sh 'php artisan migrate --env=testing --database=sqlite_testing --force'
+            //sh 'php artisan db:seed'
+            sh 'vendor/bin/codecept build'
+            sh 'vendor/bin/codecept run'
+          }
+        }
       }
     }
-    stage('Unit test') {
+    stage('the deployment') {
+      input 'Proceed the deployment ?'
+    }
+    stage('We are deploying') {
+       agent any // {
+         // docker {
+         //  image 'williamyeh/ansible:centos7'
+         //  args '-v "/var/lib/jenkins/.ssh:/root/.ssh"'
+         //}
+       //}
        steps {
-         sh 'vendor/bin/phpunit'
+         sh 'bash ansible/run.sh development'
        }
     }
-    // stage('') {
-    //  steps {
-    //    sh ''
-    //  }
-    // }
+
   }
-  // post {
-  //   failure {
-  //     // Notify developer team of the failure
-  //     mail to: 'samsul@dot-indonesia.com', subject: 'Oops!', body: "Build ${env.BUILD_NUMBER} failed; ${env.BUILD_URL}"
-  //   }
-  // }
 }
