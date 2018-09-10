@@ -2,6 +2,9 @@ pipeline {
   agent none
   stages {
     stage('repository_pull') {
+      when {
+        branch 'master'
+      }
       agent {
         docker { 
           image 'samsulmaarif/php-laravel:7.1'
@@ -15,6 +18,9 @@ pipeline {
       }
     }
     stage('Unit Testing') {
+      when {
+        branch 'master'
+      }
       parallel {
         stage('php 7.1') {
           agent {
@@ -61,6 +67,9 @@ pipeline {
       }
     }
     stage('We are deploying') {
+       when {
+         branch 'master'
+       }
        agent any // {
          // docker {
          //  image 'williamyeh/ansible:centos7'
