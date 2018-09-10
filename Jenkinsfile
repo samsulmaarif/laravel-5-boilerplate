@@ -60,9 +60,6 @@ pipeline {
         }
       }
     }
-    stage('the deployment') {
-      input message: 'ready t deploy', ok: 'Deploy'
-    }
     stage('We are deploying') {
        agent any // {
          // docker {
