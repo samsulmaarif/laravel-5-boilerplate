@@ -60,9 +60,9 @@ pipeline {
         }
       }
     }
-    stage('the deployment') {
-      input 'Proceed the deployment ?'
-    }
+    stage 'the deployment'
+    input 'Proceed the deployment ?'
+    
     stage('We are deploying') {
        agent any // {
          // docker {
