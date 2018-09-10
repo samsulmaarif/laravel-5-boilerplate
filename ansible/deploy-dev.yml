@@ -81,13 +81,13 @@
   - name: Delete current old release
     file: path={{ current_release }}
           state=absent
-    ignore_errors: no
+    ignore_errors: yes
 
   - name: Create symlink
     file: src={{ deploy_to }}
           path={{ current_release }}
           state=link
-    ignore_errors: no
+    ignore_errors: yes
 
   - name: Exit maintenance mode
     shell: chdir={{ current_release }}
