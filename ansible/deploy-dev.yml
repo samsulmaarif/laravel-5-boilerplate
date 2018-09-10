@@ -74,9 +74,9 @@
       - db:seed
       # - tambahkan yang diperlukan
 
-  - name: Enter maintenance mode
-    shell: chdir={{ current_release }}
-      {{ php_path }} artisan down
+  #- name: Enter maintenance mode
+  #  shell: chdir={{ current_release }}
+  #    {{ php_path }} artisan down
 
   - name: Delete current old release
     file: path={{ current_release }}
@@ -89,6 +89,6 @@
           state=link
     ignore_errors: yes
 
-  - name: Exit maintenance mode
-    shell: chdir={{ current_release }}
-      {{ php_path }} artisan up
+  #- name: Exit maintenance mode
+  #  shell: chdir={{ current_release }}
+  #    {{ php_path }} artisan up
