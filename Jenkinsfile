@@ -50,7 +50,7 @@ pipeline {
             sh 'cp .env.testing .env'
             // sh 'touch database/database.sqlite'
             sh 'touch storage/testing.sqlite'
-            // sh 'php -v'
+            sh 'php -v'
             // sh 'php artisan key:generate'
             // sh 'php artisan migrate --env=testing --database=sqlite_testing --force'
             //sh 'php artisan db:seed'
