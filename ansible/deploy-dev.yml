@@ -26,9 +26,10 @@
                  #owner={{ deploy_user }}
                  #group={{ deploy_user }}
 
-  - name: Create version directory
+  - name: Delete version directory
     file: path={{ deploy_to }}/{{ item }}
           state=absent
+          force=true
     with_items:
     - storage
     - public/uploads
@@ -37,16 +38,19 @@
     file: path={{ deploy_to }}/storage
           src={{ artifact_dir }}/storage
           state=link
+          force=true
 
   - name: Update public/uploads symlink
     file: path={{ deploy_to }}/public/uploads
           src={{ artifact_dir }}/uploads
           state=link
+          force=true
 
   - name: Update public/uploads symlink
     file: path={{ deploy_to }}/.env
           src={{ artifact_dir }}/.environment
           state=link
+          force=true
 
   - name: Running composer install
     shell: chdir={{ deploy_to }} 
@@ -81,13 +85,15 @@
   - name: Delete current old release
     file: path={{ current_release }}
           state=absent
-    ignore_errors: yes
+          force=true
+    ignore_errors: no
 
   - name: Create symlink
     file: src={{ deploy_to }}
           path={{ current_release }}
           state=link
-    ignore_errors: yes
+          force=true
+    ignore_errors: no
 
   #- name: Exit maintenance mode
   #  shell: chdir={{ current_release }}
