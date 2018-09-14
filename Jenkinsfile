@@ -61,16 +61,32 @@ pipeline {
       }
     }
     stage('We are deploying') {
-       agent any // {
-         // docker {
-         //  image 'williamyeh/ansible:centos7'
-         //  args '-v "/var/lib/jenkins/.ssh:/root/.ssh"'
-         //}
-       //}
-       steps {
-         input message: 'Yakin mau deploy ?', ok: 'Yakin'
-         sh 'bash ansible/run.sh development'
-       }
+      parallel {
+        stage('Deploy to Staging'){
+           agent any // {
+             // docker {
+             //  image 'williamyeh/ansible:centos7'
+             //  args '-v "/var/lib/jenkins/.ssh:/root/.ssh"'
+             //}
+           //}
+           steps {
+             input message: 'Yakin mau deploy ?', ok: 'Yakin'
+             sh 'bash ansible/run.sh development'
+           }
+        }
+        stage('Deploy to Production'){
+           agent any // {
+             // docker {
+             //  image 'williamyeh/ansible:centos7'
+             //  args '-v "/var/lib/jenkins/.ssh:/root/.ssh"'
+             //}
+           //}
+           steps {
+             input message: 'Yakin mau deploy ?', ok: 'Yakin'
+             sh 'bash ansible/run.sh production'
+           }
+        }
+      }
     }
 
   }
